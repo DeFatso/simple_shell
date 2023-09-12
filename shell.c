@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
+#include "main.h"
 /**
  * main - executes commands written on stdin
  * Return: 0
@@ -20,7 +14,7 @@ int main(void)
 
 	while (1)
 	{
-		printf("simple_shell$ ");
+		prompt();
 		if (getline(&command, &size, stdin) == -1)
 		       perror("!Error reading command!\n");
 
