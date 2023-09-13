@@ -12,7 +12,12 @@
 
 /*prototypes*/
 int prompt(void);
+
+/*helper functions*/
 size_t _strlen(const char *str);
+char *_strcpy(char *dest, const char *src);
+char *_strdup(const char *str);
+int _strcmp(const char *str1, const char *str2);
 
 
 
