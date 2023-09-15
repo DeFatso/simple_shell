@@ -25,7 +25,7 @@ int main(void)
 		if (search_paths(line, cmd_path) == -1)
 		{
 			printf("command %s not found\n", line);
-			return (-1);
+			continue;
 		}
 		printf("cmd path is > %s <\n", cmd_path);
 
