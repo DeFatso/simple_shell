@@ -3,17 +3,19 @@
 /**
  * search_paths - searches for a command in paths contained in env
  * @command: command to be searched
- * Return: 0 if file is found and -1 if not
+ * @cmd_abs_path: buffer to store the absolute path of the cmd when found
+ * Return: 0 if command is found and -1 if not
  */
 
 int search_paths(char *command, char *cmd_abs_path)
 {
 	struct stat file_info;
 	int found, i = 0;
-	char cwd[100], **path_array;
+	char cwd[100], **path_array = NULL;
 	size_t path_len;
 
-	path_array = create_path_array();
+	if (create_path_array(path_array) == -1)
+		return (-1);
 
 	getcwd(cwd, 100);
 	while (path_array[i])
@@ -22,6 +24,7 @@ int search_paths(char *command, char *cmd_abs_path)
 		if (chdir(path_array[i]) == -1)
 		{
 			perror("Failed to check path %s\n");
+			free(path_array);
 			return (-1);
 		}
 
@@ -34,11 +37,13 @@ int search_paths(char *command, char *cmd_abs_path)
 			if (chdir(cwd) == -1)
 			{
 				perror("Failed to return to cwd\n");
+				free(path_array);
 				return (-1);
 			}
 			path_len = strlen(cmd_abs_path);
 			cmd_abs_path[path_len] = '/';
 			cmd_abs_path = strcat(cmd_abs_path, command);
+			free(path_array);
 			return (0);
 		}
 		i++;
@@ -47,21 +52,23 @@ int search_paths(char *command, char *cmd_abs_path)
 	if (chdir(cwd) == -1)
 	{
 		perror("Failed to return to cwd\n");
+		free(path_array);
 		return (-1);
 	}
+	free(path_array);
 	return (-1);
 }
 
 /**
  * create_path_array - creates an array of paths from PATHS env var
+ * @path_array: buffer to store the array of paths
  * Return: array of paths
  */
 
-char **create_path_array(void)
+int create_path_array(char **path_array)
 {
 	size_t path_count = 1, i = 0;
 	char *dup_paths, *path, *delim = ":";
-	char **path_array = NULL;
 
 	/* search for path variable in environ and duplicate into a buffer */
 	while (environ[i])
@@ -87,7 +94,7 @@ char **create_path_array(void)
 	if (path_array == NULL)
 	{
 		perror("Failed to allocate memory for path_array");
-		exit(EXIT_FAILURE);
+		return (-1);
 	}
 
 	/* tokenize the buffer into individual paths and store in path_array */
@@ -100,6 +107,7 @@ char **create_path_array(void)
 		if(path != NULL)
 			path_array[i++] = strdup(path);
 	}
+	path_array[i] = NULL;
 	free(dup_paths);
 
 	return (path_array);
