@@ -110,5 +110,5 @@ int create_path_array(char **path_array)
 	path_array[i] = NULL;
 	free(dup_paths);
 
-	return (path_array);
+	return (0);
 }
