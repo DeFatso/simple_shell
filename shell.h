@@ -11,6 +11,6 @@
 extern char **environ;
 int execute(char *line);
 int search_paths(char *command, char *cmd_abs_path);
-int create_path_array(char **path_array);
+char **create_path_array(void);
 
 #endif /*MAIN_H*/

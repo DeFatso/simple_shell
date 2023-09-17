@@ -7,19 +7,25 @@
  * Return: 0 if command is found and -1 if not
  */
 
+
 int search_paths(char *command, char *cmd_abs_path)
 {
 	struct stat file_info;
 	int found, i = 0;
 	char cwd[100], **path_array = NULL;
-	size_t path_len;
 
-	if (create_path_array(path_array) == -1)
+	if ((path_array = create_path_array()) == NULL)
+	{
+		perror("Failed to create path array\n");
 		return (-1);
+	}
+	printf("first path in path array is %s\n", path_array[i]);
 
 	getcwd(cwd, 100);
+	printf("cwd is %s\n", cwd);
 	while (path_array[i])
 	{
+		printf("checking path %s...\n", path_array[i]);
 		/* change working dir to path to be searched */
 		if (chdir(path_array[i]) == -1)
 		{
@@ -32,17 +38,18 @@ int search_paths(char *command, char *cmd_abs_path)
 		found = stat(command, &file_info);
 		if (found == 0)
 		{
+			printf("path found\n");
 			/* save path in which it was found and return to original cwd */
-			getcwd(cmd_abs_path, 100);
+			getcwd(cmd_abs_path, 90);
+			printf("path found is %s\n", cmd_abs_path);
 			if (chdir(cwd) == -1)
 			{
 				perror("Failed to return to cwd\n");
 				free(path_array);
 				return (-1);
 			}
-			path_len = strlen(cmd_abs_path);
-			cmd_abs_path[path_len] = '/';
-			cmd_abs_path = strcat(cmd_abs_path, command);
+			strcat(cmd_abs_path, "/");
+			strcat(cmd_abs_path, command);
 			free(path_array);
 			return (0);
 		}
@@ -61,14 +68,15 @@ int search_paths(char *command, char *cmd_abs_path)
 
 /**
  * create_path_array - creates an array of paths from PATHS env var
- * @path_array: buffer to store the array of paths
- * Return: array of paths
+ * @path_arr: buffer to store the array of paths
+ * Return: 0 on success and -1 on failure
  */
 
-int create_path_array(char **path_array)
+char **create_path_array(void)
 {
 	size_t path_count = 1, i = 0;
 	char *dup_paths, *path, *delim = ":";
+	char **path_array;
 
 	/* search for path variable in environ and duplicate into a buffer */
 	while (environ[i])
@@ -79,6 +87,7 @@ int create_path_array(char **path_array)
 		}
 		i++;
 	}
+	printf("%s\n", dup_paths);
 
 	/* count number of paths in path variable */
 	i = 0;
@@ -94,7 +103,7 @@ int create_path_array(char **path_array)
 	if (path_array == NULL)
 	{
 		perror("Failed to allocate memory for path_array");
-		return (-1);
+		return (NULL);
 	}
 
 	/* tokenize the buffer into individual paths and store in path_array */
@@ -104,11 +113,11 @@ int create_path_array(char **path_array)
 	while (path != NULL)
 	{
 		path = strtok(NULL, delim);
-		if(path != NULL)
+		if (path != NULL)
 			path_array[i++] = strdup(path);
 	}
 	path_array[i] = NULL;
 	free(dup_paths);
 
-	return (0);
+	return (path_array);
 }
