@@ -14,18 +14,19 @@ int search_paths(char *command, char *cmd_abs_path)
 	int found, i = 0;
 	char cwd[100], **path_array = NULL;
 
-	if ((path_array = create_path_array()) == NULL)
+	/* Check if command passed is contains full path already */
+	if (stat(command, &file_info) == 0)
 	{
-		perror("Failed to create path array\n");
-		return (-1);
+		strcpy(cmd_abs_path, command);
+		return (0);
 	}
-	printf("first path in path array is %s\n", path_array[i]);
+
+	if ((path_array = create_path_array()) == NULL)
+		return (-1);
 
 	getcwd(cwd, 100);
-	printf("cwd is %s\n", cwd);
 	while (path_array[i])
 	{
-		printf("checking path %s...\n", path_array[i]);
 		/* change working dir to path to be searched */
 		if (chdir(path_array[i]) == -1)
 		{
@@ -38,10 +39,8 @@ int search_paths(char *command, char *cmd_abs_path)
 		found = stat(command, &file_info);
 		if (found == 0)
 		{
-			printf("path found\n");
 			/* save path in which it was found and return to original cwd */
 			getcwd(cmd_abs_path, 90);
-			printf("path found is %s\n", cmd_abs_path);
 			if (chdir(cwd) == -1)
 			{
 				perror("Failed to return to cwd\n");
@@ -87,7 +86,6 @@ char **create_path_array(void)
 		}
 		i++;
 	}
-	printf("%s\n", dup_paths);
 
 	/* count number of paths in path variable */
 	i = 0;

@@ -1,5 +1,5 @@
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef SHELL_H
+#define SHELL_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,9 +8,19 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <string.h>
+
+/* Prototypes */
+int prompt(void);
 extern char **environ;
-int execute(char *line);
+char **tokenise(char *cmd_line);
 int search_paths(char *command, char *cmd_abs_path);
 char **create_path_array(void);
+int free_array(char **arr);
 
-#endif /*MAIN_H*/
+/* helper functions */
+size_t _strlen(const char *str);
+char *_strcpy(char *dest, const char *src);
+char *_strdup(const char *str);
+int _strcmp(const char *str1, const char *str2);
+
+#endif /* SHELL_H */

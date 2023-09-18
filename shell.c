@@ -1,84 +1,130 @@
-#include "main.h"
+#include "shell.h"
+
 /**
- * main - executes commands written on stdin
+ * main - a simple shell
  * Return: 0
  */
 
 int main(void)
 {
-	pid_t proc;
-	int status, j;
-	size_t len, size = 0, ccount, i;
-	char **argv;
-	char *cmd, *command = NULL, ex[] = "exit";
+	pid_t childpid;
+	ssize_t nread = 0;
+	size_t len;
+	int status;
+	char ex[] = "exit", cmd_path[100], *line = NULL, **cmd_vector;
 
 	while (1)
 	{
-		prompt();
-		if (getline(&command, &size, stdin) == -1)
-		       perror("!Error reading command!\n");
+		if (prompt() == -1)
+			continue;
 
-		len = _strlen(command);
-		if (command[len-1] == '\n')
-			command[len-1] = '\0';
+		nread = getline(&line, &len, stdin);
+		if (nread == -1)
+			exit(1);
 
-		if (_strcmp(command, ex) == 0)
-		{
+		if (line[nread - 1] == '\n')
+			line[nread - 1] = '\0';
+
+		if (_strcmp(line, ex) == 0)
 			return (0);
+
+		if ((cmd_vector = tokenise(line)) == NULL)
+			continue;
+
+		if (search_paths(cmd_vector[0], cmd_path) == -1)
+		{
+			printf("command %s not found\n", line);
+			continue;
 		}
 
-		/* count number of commands given */
-		i = 0;
-		ccount = 0;
-		while (command[i])
-		{
-			if ((command[i] == ' ' && command[i+1] != ' ') || !(command[i+1]))
-				ccount++;
-			i++;
-		}
+		childpid = fork();
 
-		argv = malloc(sizeof(char *) * (ccount + 1));
-		if (argv == NULL)
+		if (childpid == -1)
 		{
-			perror("!Failed to alloc memory for command!\n");
-			return (1);
+			perror("Failed to fork\n");
+			free(line);
+			exit(90);
 		}
-
-		i = 0;
-		cmd = strtok(command, " ");
-		argv[i++] = _strdup(cmd);
-
-		while (i < ccount)
+		else if (childpid == 0)
 		{
-			cmd = strtok(NULL, " ");
-			argv[i++] = _strdup(cmd);
-		}
-		argv[i] = NULL;
-
-		proc = fork();
-		if (proc == -1)
-		{
-			perror("!failed to create process!\n");
-			return (1);
-		}
-		else if (proc == 0)
-		{
-			if (execve(argv[0], argv, NULL) == -1)
+			if (execve(cmd_path, cmd_vector, environ) == -1)
 			{
-				perror("!failed to execute command!\n");
+				perror("Failed to execute command");
+				free_array(cmd_vector);
+				free(line);
+				exit(EXIT_FAILURE);
 			}
-			exit(2);
 		}
 		else
 		{
 			wait(&status);
-			printf("command exec success :)\n");
-			j = i;
-			free(command);
-			while (j >= 0)
-				free(argv[j--]);
-			free(argv);
+			free_array(cmd_vector);
+			/*free(line);*/
 		}
+
 	}
+	return (0);
+}
+
+/**
+ * tokenise - converts the command line into an array of command args
+ * @cmd_line: the line of command inputed
+ * @count: pointer to number of arguements 
+ * Return: pointer to the array of command args
+ */
+
+char **tokenise(char *cmd_line)
+{
+	char *tok, **command;
+	size_t i = 0, count = 0;
+
+	/* count number of args in command given */
+	while (cmd_line[i])
+	{
+		if ((cmd_line[i] == ' ' && cmd_line[i+1] != ' ') || !(cmd_line[i+1]))
+			count++;
+		i++;
+	}
+
+	command = malloc((count + 1) * sizeof(char *));
+	if (command == NULL)
+	{
+		perror("Failed to allocate memory for command\n");
+		return (NULL);
+	}
+
+	i = 0;
+	tok = strtok(cmd_line, " ");
+	command[i++] = _strdup(tok);
+	while (i < count)
+	{
+		tok = strtok(NULL, " ");
+		command[i++] = _strdup(tok);
+	}
+	command[i] = NULL;
+
+	return (command);
+}
+
+/**
+ * free_array - frees the memory allocated to an array of strings
+ * @arr: pointer to array to be freed
+ * Return: 0 on success and -1 on failure
+ */
+
+int free_array(char **arr)
+{
+	size_t count = 0;
+
+	while (arr[count])
+		count++;
+
+	while (count > 0)
+	{
+		free(arr[count - 1]);
+		count--;
+	}
+	free(arr);
+
 	return (0);
 }

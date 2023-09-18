@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 /**
  * prompt - prints the prompt using write system call
  * Return: returns 0 at success and -1 at failure
@@ -15,7 +15,7 @@ int prompt(void)
 
 	if (bytes_written == -1)
 	{
-		perror("write");
+		perror("Failed to write\n");
 		return (-1);
 	}
 
