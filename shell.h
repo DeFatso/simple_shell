@@ -23,4 +23,13 @@ char *_strcpy(char *dest, const char *src);
 char *_strdup(const char *str);
 int _strcmp(const char *str1, const char *str2);
 
+char *_strchr(const char *str, int character);
+char *_strtok(char *str, const char *delim);
+
+
+char *_strchr(const char *str, int character);
+char *_strcpy(char *dest, const char *src);
+char *_strdup(const char *str);
+int _strcmp(const char *str1, const char *str2);
+
 #endif /* SHELL_H */

@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 /**
  * _strncmp - custom strncmp
  * @s1: string 1
