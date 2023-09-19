@@ -17,7 +17,7 @@ int search_paths(char *command, char *cmd_abs_path)
 	/* Check if command passed is contains full path already */
 	if (stat(command, &file_info) == 0)
 	{
-		strcpy(cmd_abs_path, command);
+		_strcpy(cmd_abs_path, command);
 		return (0);
 	}
 
@@ -49,7 +49,7 @@ int search_paths(char *command, char *cmd_abs_path)
 			}
 			strcat(cmd_abs_path, "/");
 			strcat(cmd_abs_path, command);
-			free(path_array);
+			free_array(path_array);
 			return (0);
 		}
 		i++;
@@ -58,10 +58,10 @@ int search_paths(char *command, char *cmd_abs_path)
 	if (chdir(cwd) == -1)
 	{
 		perror("Failed to return to cwd\n");
-		free(path_array);
+		free_array(path_array);
 		return (-1);
 	}
-	free(path_array);
+	free_array(path_array);
 	return (-1);
 }
 
@@ -82,7 +82,7 @@ char **create_path_array(void)
 	{
 		if (strncmp("PATH", environ[i], 4) == 0)
 		{
-			dup_paths = strdup(environ[i]);
+			dup_paths = _strdup(environ[i]);
 		}
 		i++;
 	}
@@ -107,12 +107,12 @@ char **create_path_array(void)
 	/* tokenize the buffer into individual paths and store in path_array */
 	i = 0;
 	path = strtok(dup_paths, delim);
-	path_array[i++] = strdup(path + 5);
+	path_array[i++] = _strdup(path + 5);
 	while (path != NULL)
 	{
 		path = strtok(NULL, delim);
 		if (path != NULL)
-			path_array[i++] = strdup(path);
+			path_array[i++] = _strdup(path);
 	}
 	path_array[i] = NULL;
 	free(dup_paths);
