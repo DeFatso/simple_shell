@@ -105,11 +105,11 @@ char **tokenise(char *cmd_line)
 	}
 
 	i = 0;
-	tok = strtok(cmd_line, delim);
+	tok = _strtok(cmd_line, delim);
 	command[i++] = _strdup(tok);
 	while (i < count)
 	{
-		tok = strtok(NULL, delim);
+		tok = _strtok(NULL, delim);
 		command[i++] = _strdup(tok);
 	}
 	command[i] = NULL;
