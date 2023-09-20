@@ -37,6 +37,8 @@ int main(int ac, char *av[])
 		if ((cmd_vector = tokenise(line)) == NULL)
 			continue;
 
+		free(line);
+
 		if (search_paths(cmd_vector[0], cmd_path) == -1)
 		{
 			printf("%s: 1: %s: not found\n", av[0], line);
@@ -48,26 +50,22 @@ int main(int ac, char *av[])
 		if (childpid == -1)
 		{
 			perror("Failed to fork\n");
-			free(line);
 			exit(EXIT_FAILURE);
 		}
-		else if (childpid == 0)
+		if (childpid == 0)
 		{
 			if (execve(cmd_path, cmd_vector, environ) == -1)
 			{
 				perror("Failed to execute command");
 				free_array(cmd_vector);
-				free(line);
 				exit(EXIT_FAILURE);
 			}
 		}
-		else
+		if (childpid > 0)
 		{
 			wait(&status);
 			free_array(cmd_vector);
-			/*free(line);*/
 		}
-
 	}
 	return (0);
 }
