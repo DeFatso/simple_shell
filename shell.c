@@ -39,6 +39,8 @@ int main(int ac, char *av[])
 		if ((cmd_vector = tokenise(line)) == NULL)
 			continue;
 
+		free(line);
+
 		if (search_paths(cmd_vector[0], cmd_path) == -1)
 		{
 			write(2, av[0], _strlen(av[0]));
@@ -62,7 +64,6 @@ int main(int ac, char *av[])
 			if (execve(cmd_path, cmd_vector, environ) == -1)
 			{
 				perror("Failed to execute command");
-				free(line);
 				free_array(cmd_vector);
 				exit(EXIT_FAILURE);
 			}
