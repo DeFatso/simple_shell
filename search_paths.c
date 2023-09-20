@@ -31,7 +31,7 @@ int search_paths(char *command, char *cmd_abs_path)
 		if (chdir(path_array[i]) == -1)
 		{
 			perror("Failed to check path %s\n");
-			free(path_array);
+			free_array(path_array);
 			return (-1);
 		}
 
@@ -44,7 +44,7 @@ int search_paths(char *command, char *cmd_abs_path)
 			if (chdir(cwd) == -1)
 			{
 				perror("Failed to return to cwd\n");
-				free(path_array);
+				free_array(path_array);
 				return (-1);
 			}
 			strcat(cmd_abs_path, "/");

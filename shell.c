@@ -5,22 +5,28 @@
  * Return: 0
  */
 
-int main(void)
+int main(int ac, char *av[])
 {
 	pid_t childpid;
 	ssize_t nread = 0;
 	size_t len;
-	int status;
+	int status, pipe = 1;
 	char ex[] = "exit", cmd_path[100], *line = NULL, **cmd_vector;
 
-	while (1)
+	if (ac > 1)
+		return (0);
+	while (1 && pipe)
 	{
+		pipe = isatty(STDIN_FILENO);
+
 		if (prompt() == -1)
 			continue;
 
-		nread = getline(&line, &len, stdin);
-		if (nread == -1)
-			exit(1);
+		if ((nread = getline(&line, &len, stdin)) == -1)
+		{
+			perror("Error getline");
+			exit(EXIT_FAILURE);
+		}
 
 		if (line[nread - 1] == '\n')
 			line[nread - 1] = '\0';
@@ -33,7 +39,7 @@ int main(void)
 
 		if (search_paths(cmd_vector[0], cmd_path) == -1)
 		{
-			printf("command %s not found\n", line);
+			printf("%s: 1: %s: not found\n", av[0], line);
 			continue;
 		}
 
@@ -43,7 +49,7 @@ int main(void)
 		{
 			perror("Failed to fork\n");
 			free(line);
-			exit(90);
+			exit(EXIT_FAILURE);
 		}
 		else if (childpid == 0)
 		{

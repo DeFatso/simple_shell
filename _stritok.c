@@ -9,7 +9,7 @@
 char *_strtok(char *str, const char *delim)
 {
         static char *last_token = NULL;
-        char *start;
+        char *start, *end;
 
         if (str != NULL)
         {
@@ -31,7 +31,7 @@ char *_strtok(char *str, const char *delim)
                 return (NULL);
         }
 
-        char *end = start + 1;
+        end = start + 1;
         while (*end && !_strchr(delim, *end))
                 end++;
 
