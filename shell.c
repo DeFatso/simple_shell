@@ -2,6 +2,8 @@
 
 /**
  * main - a simple shell
+ * @ac: arg count
+ * @av: arg vector
  * Return: 0
  */
 
@@ -80,7 +82,6 @@ int main(int ac, char *av[])
 /**
  * tokenise - converts the command line into an array of command args
  * @cmd_line: the line of command inputed
- * @count: pointer to number of arguements 
  * Return: pointer to the array of command args
  */
 
@@ -92,7 +93,7 @@ char **tokenise(char *cmd_line)
 	/* count number of args in command given */
 	while (cmd_line[i])
 	{
-		if ((cmd_line[i] == ' ' && cmd_line[i+1] != ' ') || !cmd_line[i+1])
+		if ((cmd_line[i] == ' ' && cmd_line[i + 1] != ' ') || !cmd_line[i + 1])
 			count++;
 		i++;
 	}
