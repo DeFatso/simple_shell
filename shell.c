@@ -43,7 +43,10 @@ int main(int ac, char *av[])
 
 		if (search_paths(cmd_vector[0], cmd_path) == -1)
 		{
-			printf("%s: 1: %s: not found\n", av[0], line);
+			write(2, av[0], _strlen(av[0]));
+			write(2, ": 1: ", 5);
+			write(2, line, _strlen(line));
+			write(2, " not found\n", 11);
 			continue;
 		}
 
@@ -108,6 +111,7 @@ char **tokenise(char *cmd_line)
 		command[i++] = _strdup(tok);
 	}
 	command[i] = NULL;
+
 	if (command[0] == NULL)
 	{
 		free_array(command);

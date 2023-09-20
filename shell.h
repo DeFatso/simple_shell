@@ -20,8 +20,10 @@ char **create_path_array(void);
 int free_array(char **arr);
 
 /* helper functions */
+char *_strcat(char *dest, char *src);
 size_t _strlen(const char *str);
 char *_strcpy(char *dest, const char *src);
+int _strncmp(const char *s1, const char *s2, size_t n);
 char *_strdup(const char *str);
 int _strcmp(const char *str1, const char *str2);
 char *_strchr(const char *str, int character);

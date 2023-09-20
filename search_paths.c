@@ -30,7 +30,6 @@ int search_paths(char *command, char *cmd_abs_path)
 		/* change working dir to path to be searched */
 		if (chdir(path_array[i]) == -1)
 		{
-			perror("Failed to check path %s\n");
 			free_array(path_array);
 			return (-1);
 		}
@@ -47,8 +46,8 @@ int search_paths(char *command, char *cmd_abs_path)
 				free_array(path_array);
 				return (-1);
 			}
-			strcat(cmd_abs_path, "/");
-			strcat(cmd_abs_path, command);
+			_strcat(cmd_abs_path, "/");
+			_strcat(cmd_abs_path, command);
 			free_array(path_array);
 			return (0);
 		}
@@ -80,7 +79,7 @@ char **create_path_array(void)
 	/* search for path variable in environ and duplicate into a buffer */
 	while (environ[i])
 	{
-		if (strncmp("PATH", environ[i], 4) == 0)
+		if (_strncmp("PATH", environ[i], 4) == 0)
 		{
 			dup_paths = _strdup(environ[i]);
 		}
@@ -106,11 +105,11 @@ char **create_path_array(void)
 
 	/* tokenize the buffer into individual paths and store in path_array */
 	i = 0;
-	path = strtok(dup_paths, delim);
+	path = _strtok(dup_paths, delim);
 	path_array[i++] = _strdup(path + 5);
 	while (path != NULL)
 	{
-		path = strtok(NULL, delim);
+		path = _strtok(NULL, delim);
 		if (path != NULL)
 			path_array[i++] = _strdup(path);
 	}
