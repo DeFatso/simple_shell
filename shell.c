@@ -46,7 +46,7 @@ int main(int ac, char *av[])
 			write(2, av[0], _strlen(av[0]));
 			write(2, ": 1: ", 5);
 			write(2, cmd_vector[0], _strlen(cmd_vector[0]));
-			write(2, " not found\n", 11);
+			write(2, ": not found\n", 12);
 			if (pipe == 0)
 				exit(127);
 			continue;
