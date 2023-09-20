@@ -5,22 +5,30 @@
  * Return: 0
  */
 
-int main(void)
+int main(int ac, char *av[])
 {
 	pid_t childpid;
 	ssize_t nread = 0;
 	size_t len;
-	int status;
+	int status, pipe;
 	char ex[] = "exit", cmd_path[100], *line = NULL, **cmd_vector;
 
+	if (ac > 1)
+		return (0);
+
+	pipe = isatty(STDIN_FILENO);
 	while (1)
 	{
-		if (prompt() == -1)
-			continue;
+		if (pipe)
+		{
+			if (prompt() == -1)
+				continue;
+		}
 
-		nread = getline(&line, &len, stdin);
-		if (nread == -1)
-			exit(1);
+		if ((nread = getline(&line, &len, stdin)) == -1)
+		{
+			exit(EXIT_SUCCESS);
+		}
 
 		if (line[nread - 1] == '\n')
 			line[nread - 1] = '\0';
@@ -31,9 +39,16 @@ int main(void)
 		if ((cmd_vector = tokenise(line)) == NULL)
 			continue;
 
+		free(line);
+
 		if (search_paths(cmd_vector[0], cmd_path) == -1)
 		{
-			printf("command %s not found\n", line);
+			write(2, av[0], _strlen(av[0]));
+			write(2, ": 1: ", 5);
+			write(2, cmd_vector[0], _strlen(cmd_vector[0]));
+			write(2, ": not found\n", 12);
+			if (pipe == 0)
+				exit(127);
 			continue;
 		}
 
@@ -42,26 +57,22 @@ int main(void)
 		if (childpid == -1)
 		{
 			perror("Failed to fork\n");
-			free(line);
-			exit(90);
+			exit(EXIT_FAILURE);
 		}
-		else if (childpid == 0)
+		if (childpid == 0)
 		{
 			if (execve(cmd_path, cmd_vector, environ) == -1)
 			{
 				perror("Failed to execute command");
 				free_array(cmd_vector);
-				free(line);
 				exit(EXIT_FAILURE);
 			}
 		}
-		else
+		if (childpid > 0)
 		{
 			wait(&status);
 			free_array(cmd_vector);
-			/*free(line);*/
 		}
-
 	}
 	return (0);
 }
@@ -75,13 +86,13 @@ int main(void)
 
 char **tokenise(char *cmd_line)
 {
-	char *tok, **command;
+	char *tok, **command, delim[] = " \t\n\r";
 	size_t i = 0, count = 0;
 
 	/* count number of args in command given */
 	while (cmd_line[i])
 	{
-		if ((cmd_line[i] == ' ' && cmd_line[i+1] != ' ') || !(cmd_line[i+1]))
+		if ((cmd_line[i] == ' ' && cmd_line[i+1] != ' ') || !cmd_line[i+1])
 			count++;
 		i++;
 	}
@@ -94,14 +105,20 @@ char **tokenise(char *cmd_line)
 	}
 
 	i = 0;
-	tok = strtok(cmd_line, " ");
+	tok = _strtok(cmd_line, delim);
 	command[i++] = _strdup(tok);
 	while (i < count)
 	{
-		tok = strtok(NULL, " ");
+		tok = _strtok(NULL, delim);
 		command[i++] = _strdup(tok);
 	}
 	command[i] = NULL;
+
+	if (command[0] == NULL)
+	{
+		free_array(command);
+		return (NULL);
+	}
 
 	return (command);
 }
