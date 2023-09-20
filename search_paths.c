@@ -21,7 +21,8 @@ int search_paths(char *command, char *cmd_abs_path)
 		return (0);
 	}
 
-	if ((path_array = create_path_array()) == NULL)
+	path_array = create_path_array();
+	if (path_array == NULL)
 		return (-1);
 
 	getcwd(cwd, 100);
@@ -76,7 +77,6 @@ char **create_path_array(void)
 	char *dup_paths, *path, *delim = ":";
 	char **path_array;
 
-	/* search for path variable in environ and duplicate into a buffer */
 	while (environ[i])
 	{
 		if (_strncmp("PATH", environ[i], 4) == 0)
@@ -85,8 +85,6 @@ char **create_path_array(void)
 		}
 		i++;
 	}
-
-	/* count number of paths in path variable */
 	i = 0;
 	while (dup_paths[i])
 	{
@@ -94,16 +92,12 @@ char **create_path_array(void)
 			path_count++;
 		i++;
 	}
-
-	/* allocat memory for path_array */
 	path_array = malloc((path_count + 1) * sizeof(char *));
 	if (path_array == NULL)
 	{
 		perror("Failed to allocate memory for path_array");
 		return (NULL);
 	}
-
-	/* tokenize the buffer into individual paths and store in path_array */
 	i = 0;
 	path = _strtok(dup_paths, delim);
 	path_array[i++] = _strdup(path + 5);
@@ -115,6 +109,5 @@ char **create_path_array(void)
 	}
 	path_array[i] = NULL;
 	free(dup_paths);
-
 	return (path_array);
 }
