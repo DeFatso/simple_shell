@@ -81,13 +81,13 @@ int main(int ac, char *av[])
 
 char **tokenise(char *cmd_line)
 {
-	char *tok, **command;
+	char *tok, **command, delim[] = " \t\n\r";
 	size_t i = 0, count = 0;
 
 	/* count number of args in command given */
 	while (cmd_line[i])
 	{
-		if ((cmd_line[i] == ' ' && cmd_line[i+1] != ' ') || !(cmd_line[i+1]))
+		if ((cmd_line[i] == ' ' && cmd_line[i+1] != ' ') || !cmd_line[i+1])
 			count++;
 		i++;
 	}
@@ -100,14 +100,19 @@ char **tokenise(char *cmd_line)
 	}
 
 	i = 0;
-	tok = strtok(cmd_line, " ");
+	tok = strtok(cmd_line, delim);
 	command[i++] = _strdup(tok);
 	while (i < count)
 	{
-		tok = strtok(NULL, " ");
+		tok = strtok(NULL, delim);
 		command[i++] = _strdup(tok);
 	}
 	command[i] = NULL;
+	if (command[0] == NULL)
+	{
+		free_array(command);
+		return (NULL);
+	}
 
 	return (command);
 }
