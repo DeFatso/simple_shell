@@ -8,38 +8,39 @@
  */
 char *_strtok(char *str, const char *delim)
 {
-        static char *last_token = NULL;
-        char *start;
+	static char *last_token;
+	char *start;
+	char *end;
 
-        if (str != NULL)
-        {
-                last_token = str;
-        }
-        if (last_token == NULL)
-        {
-                return (NULL);
-        }
+	if (str != NULL)
+	{
+		last_token = str;
+	}
+	if (last_token == NULL)
+	{
+		return (NULL);
+	}
 
-        start = last_token;
-        while (*start && _strchr(delim, *start))
-        {
-                start++;
-        }
-        if (!*start)
-        {
-                last_token = NULL;
-                return (NULL);
-        }
+	start = last_token;
+	while (*start && _strchr(delim, *start))
+	{
+		start++;
+	}
+	if (!*start)
+	{
+		last_token = NULL;
+		return (NULL);
+	}
 
-        char *end = start + 1;
-        while (*end && !_strchr(delim, *end))
-                end++;
+	end = start + 1;
+	while (*end && !_strchr(delim, *end))
+		end++;
 
-        if (*end)
-                *end++ = '\0';
+	if (*end)
+		*end++ = '\0';
 
-        last_token = end;
-        return (start);
+	last_token = end;
+	return (start);
 }
 
 /**
@@ -50,14 +51,14 @@ char *_strtok(char *str, const char *delim)
  */
 char *_strchr(const char *str, int character)
 {
-    while (*str != '\0')
-    {
-        if (*str == character)
-        {
-            return (char *)str;
-        }
-        str++;
-    }
+	while (*str != '\0')
+	{
+		if (*str == character)
+		{
+			return ((char *)str);
+		}
+		str++;
+	}
 
-    return (NULL);
+	return (NULL);
 }
