@@ -41,7 +41,6 @@ int main(int ac, char *av[])
 		if ((cmd_vector = tokenise(line)) == NULL)
 			continue;
 
-		printf("line is %s\n", line);
 		line = realloc(line, 0);
 
 		if (search_paths(cmd_vector[0], cmd_path) == -1)
