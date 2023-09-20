@@ -13,7 +13,7 @@ int main(int ac, char *av[])
 	ssize_t nread = 0;
 	size_t len;
 	int status, pipe;
-	char ex[] = "exit", cmd_path[100], *line = NULL, **cmd_vector;
+	char ex[] = "exit", cmd_path[100], *line, **cmd_vector;
 
 	if (ac > 1)
 		return (0);
@@ -27,8 +27,10 @@ int main(int ac, char *av[])
 				continue;
 		}
 
+		line = NULL;
 		if ((nread = getline(&line, &len, stdin)) == -1)
 		{
+			free(line);
 			exit(EXIT_SUCCESS);
 		}
 
@@ -36,12 +38,18 @@ int main(int ac, char *av[])
 			line[nread - 1] = '\0';
 
 		if (_strcmp(line, ex) == 0)
+		{
+			free(line);
 			return (0);
+		}
 
 		if ((cmd_vector = tokenise(line)) == NULL)
+		{
+			free(line);
 			continue;
+		}
 
-		line = realloc(line, 0);
+		free(line);
 
 		if (search_paths(cmd_vector[0], cmd_path) == -1)
 		{
@@ -49,6 +57,7 @@ int main(int ac, char *av[])
 			write(2, ": 1: ", 5);
 			write(2, cmd_vector[0], _strlen(cmd_vector[0]));
 			write(2, ": not found\n", 12);
+			free_array(cmd_vector);
 			if (pipe == 0)
 				exit(127);
 			continue;
