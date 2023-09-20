@@ -10,22 +10,24 @@ int main(int ac, char *av[])
 	pid_t childpid;
 	ssize_t nread = 0;
 	size_t len;
-	int status, pipe = 1;
+	int status, pipe;
 	char ex[] = "exit", cmd_path[100], *line = NULL, **cmd_vector;
 
 	if (ac > 1)
 		return (0);
-	while (1 && pipe)
-	{
-		pipe = isatty(STDIN_FILENO);
 
-		if (prompt() == -1)
-			continue;
+	pipe = isatty(STDIN_FILENO);
+	while (1)
+	{
+		if (pipe)
+		{
+			if (prompt() == -1)
+				continue;
+		}
 
 		if ((nread = getline(&line, &len, stdin)) == -1)
 		{
-			perror("Error getline");
-			exit(EXIT_FAILURE);
+			exit(EXIT_SUCCESS);
 		}
 
 		if (line[nread - 1] == '\n')
