@@ -9,11 +9,8 @@
 
 int main(int ac, char *av[])
 {
-	pid_t childpid;
-	ssize_t nread = 0;
-	size_t len;
-	int status, pipe;
-	char ex[] = "exit", cmd_path[100], *line, **cmd_vector;
+	int pipe;
+	char cmd_path[100], **cmd_vector;
 
 	if (ac > 1)
 		return (0);
@@ -27,29 +24,9 @@ int main(int ac, char *av[])
 				continue;
 		}
 
-		line = NULL;
-		if ((nread = getline(&line, &len, stdin)) == -1)
-		{
-			free(line);
-			exit(EXIT_SUCCESS);
-		}
-
-		if (line[nread - 1] == '\n')
-			line[nread - 1] = '\0';
-
-		if (_strcmp(line, ex) == 0)
-		{
-			free(line);
-			return (0);
-		}
-
-		if ((cmd_vector = tokenise(line)) == NULL)
-		{
-			free(line);
+		cmd_vector = get_command();
+		if (cmd_vector == NULL)
 			continue;
-		}
-
-		free(line);
 
 		if (search_paths(cmd_vector[0], cmd_path) == -1)
 		{
@@ -63,27 +40,7 @@ int main(int ac, char *av[])
 			continue;
 		}
 
-		childpid = fork();
-
-		if (childpid == -1)
-		{
-			perror("Failed to fork\n");
-			exit(EXIT_FAILURE);
-		}
-		if (childpid == 0)
-		{
-			if (execve(cmd_path, cmd_vector, environ) == -1)
-			{
-				perror("Failed to execute command");
-				free_array(cmd_vector);
-				exit(EXIT_FAILURE);
-			}
-		}
-		if (childpid > 0)
-		{
-			wait(&status);
-			free_array(cmd_vector);
-		}
+		execute(cmd_path, cmd_vector);
 	}
 	return (0);
 }

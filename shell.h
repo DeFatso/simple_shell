@@ -18,6 +18,8 @@ char **tokenise(char *cmd_line);
 int search_paths(char *command, char *cmd_abs_path);
 char **create_path_array(void);
 int free_array(char **arr);
+void execute(char *cmd, char *cmd_vec[]);
+char **get_command(void);
 
 /* helper functions */
 char *_strcat(char *dest, char *src);
